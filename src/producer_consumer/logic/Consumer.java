@@ -10,6 +10,7 @@ public class Consumer {
   /**
    * consumer thread waits while buffer is empty
    * 
+   * @return
    * @throws InterruptedException
    */
   public void eat() throws InterruptedException {

@@ -21,7 +21,7 @@ public class Chapati {
   }
 
   /**
-   * Check if chapatti is ready, its size should be greater or equal to zero
+   * Check if chapati is ready, its size should be greater or equal to zero
    * 
    * @return boolean
    */
@@ -38,6 +38,6 @@ public class Chapati {
 
   @Override
   public String toString() {
-    return "Chapatti " + size + "in";
+    return "Chapati " + size + "in";
   }
 }
