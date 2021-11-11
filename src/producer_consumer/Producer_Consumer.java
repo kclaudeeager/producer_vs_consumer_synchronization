@@ -41,10 +41,10 @@ public class Producer_Consumer extends Application {
     @Override
     public void start(Stage primaryStage) {
         Button btn = new Button();
-        btn.setText("Start activity!");
+        btn.setText("Prepare the production prerequisites");
    
         
-        StackPane root = new StackPane();
+        HBox root = new HBox();
 //        String Imagestring="consumer_producer_images/butler.jpg";
 //        Image image=new Image(Producer_Consumer.class.getResource(Imagestring).toExternalForm());
 //        ImageView imageview=new ImageView(image);
@@ -55,6 +55,7 @@ public class Producer_Consumer extends Application {
             public void handle(ActionEvent event) {
                 try {
                     root.getChildren().add(GetEssential_Tools());
+                    root.getChildren().remove(btn);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Producer_Consumer.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -94,16 +95,17 @@ public class Producer_Consumer extends Application {
     myImages.add(stove);
     myImages.add(fryingPan);
    // myImages.add(table);
-     myImages.add(producer1);
+     
     
     myImages.add(baking_powder);
     myImages.add(cooking_oil);
   myImages.add(onions);
+  myImages.add(producer1);
    Timeline mytimeline = null;
     FlowPane Essential_Tools=new FlowPane();
 Thread thread = null;
          for(String image_source:myImages){
-            Image image=new Image(Producer_Consumer.class.getResource(image_source).toExternalForm());
+            Image image=new Image(Producer_Consumer.class.getResource(image_source).toExternalForm(),100,100,false,false);
             ImageView imageview=new ImageView(image);
         thread=new Thread(new Runnable(){
             public void run(){
@@ -115,6 +117,7 @@ Thread thread = null;
                 System.out.print("Waiting a sec..");
                     Platform.runLater(()->{
                           Essential_Tools.getChildren().add(imageview);
+                          
                     });
             }
         });
