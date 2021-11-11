@@ -29,7 +29,7 @@ public class Chapati {
     if (this.size <= 0) {
       return false;
     }
-    return this.isReady;
+    return this.isReady == true;
   }
 
   public void setIsReady(boolean isReady) {

@@ -50,7 +50,7 @@ public class Buffer {
    * @return - Chappati
    */
   public Chapati removeChapati() {
-    return this.chapatis.remove();
+    return this.chapatis.poll();
   }
 
   /**

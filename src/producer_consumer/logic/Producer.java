@@ -5,7 +5,6 @@ public class Producer {
   private Buffer buffer;
 
   public Producer(Buffer buffer) {
-    this.chapati = new Chapati();
     this.buffer = buffer;
   }
 
@@ -19,14 +18,17 @@ public class Producer {
     int size = 0;
     while (true) {
       synchronized (this) {
-        while (buffer.isFull())
+        while (buffer.isFull()) {
+          notify();
           wait();
+        }
 
+        chapati = new Chapati();
         bake(++size);
         cook();
-        buffer.addChapati(this.chapati);
+        buffer.addChapati(chapati);
 
-        System.out.println("Chapati " + size + "in produced");
+        System.out.println(chapati.toString() + " produced");
 
         notify();
 
@@ -36,7 +38,7 @@ public class Producer {
   }
 
   public void bake(int size) {
-    this.chapati.setSize(size);
+    chapati.setSize(size);
   }
 
   public void cook() {

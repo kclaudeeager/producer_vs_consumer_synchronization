@@ -16,8 +16,10 @@ public class Consumer {
   public void eat() throws InterruptedException {
     while (true) {
       synchronized (this) {
-        while (buffer.isEmpty())
+        while (buffer.isEmpty()) {
+          notify();
           wait();
+        }
 
         Chapati chap = buffer.removeChapati();
 
