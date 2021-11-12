@@ -5,9 +5,12 @@
  */
 package Updated_logic;
 
+import static Updated_logic.ProducerTask.i;
 import javafx.application.Platform;
 import static producer_consumer.Producer_Consumer.Buffer.buffer;
+import static producer_consumer.Producer_Consumer.consumerStatus;
 import static producer_consumer.Producer_Consumer.producerStatus;
+import static producer_consumer.Producer_Consumer.statusTextArea;
 
 
 /**
@@ -18,8 +21,8 @@ public class ConsumerTask implements Runnable {
   public void run() {
 try {
  while (true) {
-  System.out.println("\t\t\tConsumer reads " + buffer.read());
-  
+  System.out.println("\t\t\tConsumer consumed " + buffer.read());
+     Platform.runLater(()->statusTextArea.appendText("\t\t\t\t\t\t Consumer consumed " + buffer.read()+" chapaties \n"));
   // Put the thread into sleep
   Thread.sleep((int)(Math.random() * 10000));
   }

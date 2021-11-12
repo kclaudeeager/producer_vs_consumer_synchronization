@@ -7,6 +7,7 @@ package producer_consumer;
 
 import Updated_logic.ConsumerTask;
 import Updated_logic.ProducerTask;
+import static Updated_logic.ProducerTask.i;
 import static com.sun.javafx.scene.control.skin.Utils.getResource;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -44,6 +45,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 /**
  *
  * @author Kwizera
@@ -56,8 +58,9 @@ public class Producer_Consumer extends Application {
        ConsumerTask consumerTask;
        static GridPane tablegridpane=null;
        static boolean isReady=false;
-       public static Label producerStatus=new Label("Produce: ");
-         public static Label consumerStatus=new Label("Consumer: ");
+       public static Label producerStatus=new Label("Producer ");
+         public static Label consumerStatus=new Label("Consumer");
+         public static TextArea statusTextArea=new TextArea();
        public static Producer_Consumer producer_consumer=new Producer_Consumer();
     @Override
     public void start(Stage primaryStage) {
@@ -85,11 +88,14 @@ public class Producer_Consumer extends Application {
          vbox.getChildren().add(startProduction);
             GridPane homePane = new GridPane();
          homePane.add(root  ,0, 0, 1, 1);
+         
        
           //HandleTable_plates_Add();
         tablegridpane=new GridPane();
- tablegridpane.add(producerStatus, 0,0,1,1);
-  tablegridpane.add(consumerStatus, 0,1,1,1);
+        tablegridpane.setVgap(10);
+        tablegridpane.setHgap(15);
+// tablegridpane.add(producerStatus, 0,0,1,1);
+//  tablegridpane.add(consumerStatus, 0,1,1,1);
  
        
          tablegridpane.setVgap(1);
@@ -123,11 +129,14 @@ public class Producer_Consumer extends Application {
            startProduction.setDisable(true);
             String producing_chapati="consumer_producer_images/producer_gif.gif";
            
-           homePane.add(ClientPane,5,1,1,1);
+           homePane.add(statusTextArea, 4,0,1,1);
+           statusTextArea.setEditable(false);
+//          Platform.runLater(()->statusTextArea.setMinHeight(i));
             Image image=new Image(Producer_Consumer.class.getResource(producing_chapati).toExternalForm(),100,100,false,false);
                       ImageView imageview=new ImageView(image); 
                    HBox hb=new HBox();
                     hb.getChildren().add(imageview);
+                    vbox.getChildren().add(producerStatus);
                        vbox.getChildren().add(imageview);
            Thread annimate=new Thread(new Runnable(){
                public void run(){
@@ -165,7 +174,9 @@ public class Producer_Consumer extends Application {
   
   StackPane tableroomPane=getTablePane();
                            tablegridpane.add(tableroomPane,0,3,1,1);
+                           tablegridpane.add(ClientPane,4,3,1,1);
          });
+         
        //homePane.setAlignment(Pos.CENTER);
         //homePane.setGridLinesVisible(true);
          homePane.setHgap(10);
@@ -304,7 +315,7 @@ myThread.start();
          Image tableImage=new Image(Producer_Consumer.class.getResource(tableSrc).toExternalForm(),100,100,false,false);
          ImageView tableImageview=new ImageView(tableImage);
          tableroomPane.getChildren().add(tableImageview);
-        
+        tableroomPane.getChildren().add(new Label("Serving table"));
 //         tableroomPane.getChildren().add(platePane);
          return tableroomPane;
     }
@@ -331,15 +342,14 @@ myThread.start();
      while (queue.size() == CAPACITY) {
  
          System.out.println("Wait for notFull condition");
-         Platform.runLater(()->  producerStatus.setText("Wait for notFull condition"));
+          Platform.runLater(()->statusTextArea.appendText("Wait for notFull condition \n"));
+         //Platform.runLater(()->  producerStatus.setText("Wait for notFull condition"));
       notFull.await();
-  }
-     
+  }    
 
  queue.offer(value);
- HandleTable_plates_Add();
- Platform.runLater(()->producerStatus.setText("Producer writes " +value));
- 
+   HandleTable_plates_Add();
+
 notEmpty.signal(); // Signal notEmpty condition
   }
 catch (InterruptedException ex) {
@@ -359,9 +369,10 @@ catch (InterruptedException ex) {
             imageview=new ImageView(image);   
               
                 Platform.runLater(()->{
+                     
                           platePane.getChildren().add(imageview);
                          tablegridpane.add(platePane,0,2,1,1);
-                         
+                        //producerStatus.setText("Producer writes " +i);
                     });
     
        
@@ -369,8 +380,12 @@ catch (InterruptedException ex) {
   public void Remove_plate(){
       
                 Platform.runLater(()->{
+                 
+
                           platePane.getChildren().remove(imageview);
                          tablegridpane.getChildren().remove(platePane);
+                         //consumerStatus.setText("Consumer reads" + buffer.read());
+                         
                     });
   }
 
@@ -381,14 +396,13 @@ catch (InterruptedException ex) {
   try {
  while (queue.isEmpty()) {
  System.out.println("\t\t\tWait for notEmpty condition");
- Platform.runLater(()-> consumerStatus.setText("Wait for notEmpty condition"));
-
+ Platform.runLater(()->statusTextArea.appendText("\t\t\t\t\t\t Wait for notEmpty condition\n"));
+ //Platform.runLater(()-> consumerStatus.setText("Wait for notEmpty condition"));
  notEmpty.await();
  }
- 
+  
   value = queue.remove();
-  Remove_plate();
-  Platform.runLater(()->consumerStatus.setText("Consumer reads " + buffer.read()));
+   Remove_plate();
   notFull.signal(); // Signal notFull condition
   }
  catch (InterruptedException ex) {

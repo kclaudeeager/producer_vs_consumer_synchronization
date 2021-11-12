@@ -16,19 +16,18 @@ import javafx.application.Platform;
 import static producer_consumer.Producer_Consumer.Buffer.buffer;
 import static producer_consumer.Producer_Consumer.producer_consumer;
 import static producer_consumer.Producer_Consumer.producerStatus;
+import static producer_consumer.Producer_Consumer.statusTextArea;
 public class ProducerTask implements Runnable {
+   public static int i = 1;
   public void run() {
   try {
-  int i = 1;
+  
  while (true) {
   System.out.println("Producer writes " + i);
-
-      
-        //
-                
-          
+  Platform.runLater(()->statusTextArea.appendText("Producer produced  " + i+" Chapaties\n"));
+        //        
  buffer.write(i++); // Add a value to the buffer
-
+ 
  // Put the thread into sleep
   Thread.sleep((int)(Math.random() * 10000));
   }
