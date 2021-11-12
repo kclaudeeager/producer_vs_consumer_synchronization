@@ -51,13 +51,20 @@ import javafx.scene.control.TextArea;
  * @author Kwizera
  */
 public class Producer_Consumer extends Application {
-    String  client_StateUri=null;
-    ImageView ClientImageView=null;
+    static String  client_StateUri=null;
+    static ImageView ClientImageView=null;
        static VBox platePane=null;
        ProducerTask produce;
        ConsumerTask consumerTask;
+       static FlowPane ClientPane=null;
        static GridPane tablegridpane=null;
        static boolean isReady=false;
+        static ImageView ServerImageview=null;
+     static  VBox prductionVbox=new VBox();
+     static String producing_chapati="consumer_producer_images/producer_gif.gif";
+        static String newClientState="consumer_producer_images/waiting2.jpg";
+          static String newClientState_eating="consumer_producer_images/eating_chapati.gif";
+   
        public static Label producerStatus=new Label("Producer ");
          public static Label consumerStatus=new Label("Consumer");
          public static TextArea statusTextArea=new TextArea();
@@ -68,24 +75,21 @@ public class Producer_Consumer extends Application {
         produce=new ProducerTask();
         consumerTask=new ConsumerTask();
         
-        
+          Image image=new Image(Producer_Consumer.class.getResource(producing_chapati).toExternalForm(),100,100,false,false);
           ExecutorService executor = Executors.newFixedThreadPool(2);
   
         btn.setText("Prepare the production prerequisites");
          client_StateUri="consumer_producer_images/waiting1.jpg";
-         String newClientState="consumer_producer_images/waiting2.jpg";
-          String newClientState_eating="consumer_producer_images/eating_chapati.gif";
-   
+       
 //        GridPane homePane=new GridPane();
         HBox root = new HBox();
 //        String Imagestring="consumer_producer_images/butler.jpg";
 //        Image image=new Image(Producer_Consumer.class.getResource(Imagestring).toExternalForm());
-//        ImageView imageview=new ImageView(image);
+//        ImageView ServerImageview=new ImageView(image);
         root.getChildren().add(btn);
-         VBox vbox=new VBox();
-         vbox.setSpacing(10);
-         Button startProduction=new Button("Start production");
-         vbox.getChildren().add(startProduction);
+         prductionVbox.setSpacing(10);
+         Button startProduction=new Button("Start Activities");
+         prductionVbox.getChildren().add(startProduction);
             GridPane homePane = new GridPane();
          homePane.add(root  ,0, 0, 1, 1);
          
@@ -101,7 +105,7 @@ public class Producer_Consumer extends Application {
          tablegridpane.setVgap(1);
          
          SetClientPane(newClientState_eating);
-          FlowPane ClientPane=getClientStatePane();
+          ClientPane=getClientStatePane();
               
           btn.setOnAction(new EventHandler<ActionEvent>() {
             
@@ -110,7 +114,7 @@ public class Producer_Consumer extends Application {
                 try {
                     root.getChildren().add(Display_Images(Get_Essentials()));
                     root.getChildren().remove(btn);
-                     root.getChildren().add(vbox);
+                     root.getChildren().add(prductionVbox);
                       
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Producer_Consumer.class.getName()).log(Level.SEVERE, null, ex);
@@ -121,23 +125,23 @@ public class Producer_Consumer extends Application {
         
          startProduction.setOnAction(event->{
             try {
-                vbox.getChildren().add(Display_Images(StartProduction_Data()));
+                prductionVbox.getChildren().add(Display_Images(StartProduction_Data()));
                 Platform.runLater(()->homePane.add(tablegridpane, 4,1,1,1));
             } catch (InterruptedException ex) {
                 Logger.getLogger(Producer_Consumer.class.getName()).log(Level.SEVERE, null, ex);
             }
            startProduction.setDisable(true);
-            String producing_chapati="consumer_producer_images/producer_gif.gif";
+           
            
            homePane.add(statusTextArea, 4,0,1,1);
            statusTextArea.setEditable(false);
 //          Platform.runLater(()->statusTextArea.setMinHeight(i));
-            Image image=new Image(Producer_Consumer.class.getResource(producing_chapati).toExternalForm(),100,100,false,false);
-                      ImageView imageview=new ImageView(image); 
+          
+                      ServerImageview=new ImageView(image); 
                    HBox hb=new HBox();
-                    hb.getChildren().add(imageview);
-                    vbox.getChildren().add(producerStatus);
-                       vbox.getChildren().add(imageview);
+                    hb.getChildren().add(ServerImageview);
+                    prductionVbox.getChildren().add(producerStatus);
+                       prductionVbox.getChildren().add(ServerImageview);
            Thread annimate=new Thread(new Runnable(){
                public void run(){
                        
@@ -149,8 +153,8 @@ public class Producer_Consumer extends Application {
            
                    Platform.runLater(()->{
                      
-                       imageview.setX(imageview.getLayoutX()+timerr*20);
-                       imageview.setY(imageview.getLayoutY()+timerr*10);
+                       ServerImageview.setX(ServerImageview.getLayoutX()+timerr*20);
+                       ServerImageview.setY(ServerImageview.getLayoutY()+timerr*10);
                    });
                    timerr--;
                    
@@ -174,7 +178,7 @@ public class Producer_Consumer extends Application {
   
   StackPane tableroomPane=getTablePane();
                            tablegridpane.add(tableroomPane,0,3,1,1);
-                           tablegridpane.add(ClientPane,4,3,1,1);
+                            tablegridpane.add(ClientPane,4,3,1,1);
          });
          
        //homePane.setAlignment(Pos.CENTER);
@@ -292,9 +296,10 @@ myThread.start();
                    return Essential_Tools;
    
    }
-   public  void SetClientPane(String Imgeuri){
+   public  static void SetClientPane(String Imgeuri){
   
        client_StateUri=Imgeuri;
+     
     
    }
 //   public void ChangeCustomerState(String oldIm,String newIm){
@@ -302,9 +307,9 @@ myThread.start();
 //       oldIm=newIm;
 //       
 //   }
-   public FlowPane getClientStatePane(){
+   public static FlowPane getClientStatePane(){
         FlowPane customerPane=new FlowPane(); 
-       Image client_image= new Image(Producer_Consumer.class.getResource(client_StateUri).toExternalForm(),100,100,false,false);
+        Image client_image= new Image(Producer_Consumer.class.getResource(client_StateUri).toExternalForm(),100,100,false,false);
        ClientImageView=new ImageView(client_image);
        customerPane.getChildren().add(ClientImageView);
        return customerPane;
@@ -342,14 +347,27 @@ myThread.start();
      while (queue.size() == CAPACITY) {
  
          System.out.println("Wait for notFull condition");
-          Platform.runLater(()->statusTextArea.appendText("Wait for notFull condition \n"));
-         //Platform.runLater(()->  producerStatus.setText("Wait for notFull condition"));
-      notFull.await();
-  }    
+          Platform.runLater(()->{statusTextArea.appendText("Wait for notFull condition \n");
 
+         prductionVbox.getChildren().remove(ServerImageview);
+});
+//Platform.runLater(()->  producerStatus.setText("Wait for notFull condition"));
+      notFull.await();
+  }  
+     if( !prductionVbox.getChildren().contains(ServerImageview)){
+Platform.runLater(()->{
+     prductionVbox.getChildren().add(ServerImageview);
+});
+     }
  queue.offer(value);
    HandleTable_plates_Add();
-
+   Platform.runLater(()->{
+       tablegridpane.getChildren().remove(ClientPane);
+                          SetClientPane(newClientState_eating);
+                           ClientPane=getClientStatePane();
+                           tablegridpane.add(ClientPane,4,3,1,1);
+   });
+    
 notEmpty.signal(); // Signal notEmpty condition
   }
 catch (InterruptedException ex) {
@@ -372,6 +390,7 @@ catch (InterruptedException ex) {
                      
                           platePane.getChildren().add(imageview);
                          tablegridpane.add(platePane,0,2,1,1);
+                         
                         //producerStatus.setText("Producer writes " +i);
                     });
     
@@ -396,13 +415,18 @@ catch (InterruptedException ex) {
   try {
  while (queue.isEmpty()) {
  System.out.println("\t\t\tWait for notEmpty condition");
- Platform.runLater(()->statusTextArea.appendText("\t\t\t\t\t\t Wait for notEmpty condition\n"));
+ Platform.runLater(()->{statusTextArea.appendText("\t\t\t\t\t\t Wait for notEmpty condition\n");
+ tablegridpane.getChildren().remove(ClientPane);
+      SetClientPane(newClientState);
+     ClientPane=getClientStatePane();
+    tablegridpane.add(ClientPane,4,3,1,1);
+ });
  //Platform.runLater(()-> consumerStatus.setText("Wait for notEmpty condition"));
  notEmpty.await();
  }
-  
   value = queue.remove();
    Remove_plate();
+  
   notFull.signal(); // Signal notFull condition
   }
  catch (InterruptedException ex) {
