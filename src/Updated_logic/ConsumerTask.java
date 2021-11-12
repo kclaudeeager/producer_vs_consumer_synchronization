@@ -5,7 +5,10 @@
  */
 package Updated_logic;
 
-import static Updated_logic.Buffer.buffer;
+import javafx.application.Platform;
+import static producer_consumer.Producer_Consumer.Buffer.buffer;
+import static producer_consumer.Producer_Consumer.producerStatus;
+
 
 /**
  *
@@ -16,6 +19,7 @@ public class ConsumerTask implements Runnable {
 try {
  while (true) {
   System.out.println("\t\t\tConsumer reads " + buffer.read());
+  
   // Put the thread into sleep
   Thread.sleep((int)(Math.random() * 10000));
   }

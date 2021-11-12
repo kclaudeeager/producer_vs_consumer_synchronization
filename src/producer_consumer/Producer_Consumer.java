@@ -5,10 +5,13 @@
  */
 package producer_consumer;
 
+import Updated_logic.ConsumerTask;
+import Updated_logic.ProducerTask;
 import static com.sun.javafx.scene.control.skin.Utils.getResource;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Handler;
@@ -37,7 +40,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte0.runnable;
-
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import javafx.scene.control.Label;
 /**
  *
  * @author Kwizera
@@ -45,10 +51,23 @@ import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStat
 public class Producer_Consumer extends Application {
     String  client_StateUri=null;
     ImageView ClientImageView=null;
+       static VBox platePane=null;
+       ProducerTask produce;
+       ConsumerTask consumerTask;
+       static GridPane tablegridpane=null;
+       static boolean isReady=false;
+       public static Label producerStatus=new Label("Produce: ");
+         public static Label consumerStatus=new Label("Consumer: ");
+       public static Producer_Consumer producer_consumer=new Producer_Consumer();
     @Override
     public void start(Stage primaryStage) {
         Button btn = new Button();
+        produce=new ProducerTask();
+        consumerTask=new ConsumerTask();
         
+        
+          ExecutorService executor = Executors.newFixedThreadPool(2);
+  
         btn.setText("Prepare the production prerequisites");
          client_StateUri="consumer_producer_images/waiting1.jpg";
          String newClientState="consumer_producer_images/waiting2.jpg";
@@ -66,7 +85,15 @@ public class Producer_Consumer extends Application {
          vbox.getChildren().add(startProduction);
             GridPane homePane = new GridPane();
          homePane.add(root  ,0, 0, 1, 1);
-         StackPane tableroomPane=getTablePane();
+       
+          //HandleTable_plates_Add();
+        tablegridpane=new GridPane();
+ tablegridpane.add(producerStatus, 0,0,1,1);
+  tablegridpane.add(consumerStatus, 0,1,1,1);
+ 
+       
+         tablegridpane.setVgap(1);
+         
          SetClientPane(newClientState_eating);
           FlowPane ClientPane=getClientStatePane();
               
@@ -89,30 +116,74 @@ public class Producer_Consumer extends Application {
          startProduction.setOnAction(event->{
             try {
                 vbox.getChildren().add(Display_Images(StartProduction_Data()));
+                Platform.runLater(()->homePane.add(tablegridpane, 4,1,1,1));
             } catch (InterruptedException ex) {
                 Logger.getLogger(Producer_Consumer.class.getName()).log(Level.SEVERE, null, ex);
             }
            startProduction.setDisable(true);
-           homePane.add(tableroomPane, 1,1,1,1);
-           homePane.add(ClientPane,2,1,1,1);
-
+            String producing_chapati="consumer_producer_images/producer_gif.gif";
            
+           homePane.add(ClientPane,5,1,1,1);
+            Image image=new Image(Producer_Consumer.class.getResource(producing_chapati).toExternalForm(),100,100,false,false);
+                      ImageView imageview=new ImageView(image); 
+                   HBox hb=new HBox();
+                    hb.getChildren().add(imageview);
+                       vbox.getChildren().add(imageview);
+           Thread annimate=new Thread(new Runnable(){
+               public void run(){
+                       
+                        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+                    
+        final Runnable runnable = new Runnable() {
+             int timerr=100;
+            public void run() {
+           
+                   Platform.runLater(()->{
+                     
+                       imageview.setX(imageview.getLayoutX()+timerr*20);
+                       imageview.setY(imageview.getLayoutY()+timerr*10);
+                   });
+                   timerr--;
+                   
+                if (timerr<0) {
+                    System.out.println("Timer Over!");
+                    scheduler.shutdown();
+                }
+            }
+        
+        };
+        scheduler.scheduleAtFixedRate(runnable, 0, 1, SECONDS);
+    }
+                     
+           });
+           annimate.start();
+           
+        executor.execute((Runnable)produce );
+
+  executor.execute(consumerTask);
+  executor.shutdown();
+  
+  StackPane tableroomPane=getTablePane();
+                           tablegridpane.add(tableroomPane,0,3,1,1);
          });
-      
-         Scene scene = new Scene(homePane, 1200, 600);
+       //homePane.setAlignment(Pos.CENTER);
+        //homePane.setGridLinesVisible(true);
+         homePane.setHgap(10);
+          homePane.autosize();
+         Scene scene = new Scene(homePane, 1200, 6500);
         
         primaryStage.setTitle("Produce vs consumer!");
         primaryStage.setScene(scene);
         primaryStage.show();
+         
     }
-    public StackPane getTablePane(){
-         String tableSrc="consumer_producer_images/table.jpg";
-         StackPane tableroomPane=new StackPane();
-         Image tableImage=new Image(Producer_Consumer.class.getResource(tableSrc).toExternalForm(),100,100,false,false);
-         ImageView tableImageview=new ImageView(tableImage);
-         tableroomPane.getChildren().add(tableImageview);
-         return tableroomPane;
+
+ 
+    public static void SetReady(boolean ready){
+        isReady=ready;
     }
+ 
+   
     public ArrayList<String> Get_Essentials(){
                   String Imagestring="consumer_producer_images/bakingg";
             String butler="consumer_producer_images/butler.jpg";
@@ -135,7 +206,7 @@ public class Producer_Consumer extends Application {
   myImages.add(onions);
   return myImages;
     }
-    public ArrayList<String> StartProduction_Data(){
+    public  ArrayList<String> StartProduction_Data(){
          int height = 300;
            int width = 300;
         FlowPane flowpane=new FlowPane();
@@ -143,9 +214,9 @@ public class Producer_Consumer extends Application {
            String cooking_oil="consumer_producer_images/cookingg oil.jpg";
            String Karaga="consumer_producer_images/karagga1.gif";
             String powder="consumer_producer_images/powder.jpg";
-            String producing_chapati="consumer_producer_images/producer_gif.gif";
+          
              ArrayList<String> myImages=new ArrayList<String>();
-              myImages.add(producing_chapati);
+              //myImages.add(producing_chapati);
                   myImages.add(Imagestring);
                      myImages.add( cooking_oil);
                          myImages.add(Karaga);
@@ -153,6 +224,7 @@ public class Producer_Consumer extends Application {
               
         return  myImages;
     }
+     
 
     /**
      * @param args the command line arguments
@@ -226,8 +298,111 @@ myThread.start();
        customerPane.getChildren().add(ClientImageView);
        return customerPane;
    }
+        public StackPane getTablePane(){
+         String tableSrc="consumer_producer_images/servingtable.jpg";
+         StackPane tableroomPane=new StackPane();
+         Image tableImage=new Image(Producer_Consumer.class.getResource(tableSrc).toExternalForm(),100,100,false,false);
+         ImageView tableImageview=new ImageView(tableImage);
+         tableroomPane.getChildren().add(tableImageview);
+        
+//         tableroomPane.getChildren().add(platePane);
+         return tableroomPane;
+    }
    
-   
+   public static class Buffer {
+    private static final int CAPACITY = 1; // buffer size
+  private java.util.LinkedList<Integer> queue =
+  new java.util.LinkedList<>();
+  
+  public static Buffer buffer = new Buffer();
+    Image image=null;
+     ImageView imageview=null;
+ // Create a new lock
+ private static Lock lock = new ReentrantLock();
+ 
+  // Create two conditions
+  private static Condition notEmpty = lock.newCondition();
+  private static Condition notFull = lock.newCondition();
+ 
+ public void write(int value) {
+ lock.lock(); // Acquire the lock
+ try {
+
+     while (queue.size() == CAPACITY) {
+ 
+         System.out.println("Wait for notFull condition");
+         Platform.runLater(()->  producerStatus.setText("Wait for notFull condition"));
+      notFull.await();
+  }
+     
+
+ queue.offer(value);
+ HandleTable_plates_Add();
+ Platform.runLater(()->producerStatus.setText("Producer writes " +value));
+ 
+notEmpty.signal(); // Signal notEmpty condition
+  }
+catch (InterruptedException ex) {
+ ex.printStackTrace();
+}
+  finally {
+  lock.unlock(); // Release the lock
+ }
+  }
+  public  void HandleTable_plates_Add(){
+        platePane=new VBox();
+        ArrayList<String> myImages=new ArrayList<String>();
+         String chapatiResource="consumer_producer_images/chapatiPlate.jpg";
+            //myImages.add(chapatiResource);
+ 
+              image=new Image(Producer_Consumer.class.getResource(chapatiResource).toExternalForm(),100,100,false,false);
+            imageview=new ImageView(image);   
+              
+                Platform.runLater(()->{
+                          platePane.getChildren().add(imageview);
+                         tablegridpane.add(platePane,0,2,1,1);
+                         
+                    });
+    
+       
+    }
+  public void Remove_plate(){
+      
+                Platform.runLater(()->{
+                          platePane.getChildren().remove(imageview);
+                         tablegridpane.getChildren().remove(platePane);
+                    });
+  }
+
+ 
+ public int read() {
+ int value = 0;
+ lock.lock(); // Acquire the lock
+  try {
+ while (queue.isEmpty()) {
+ System.out.println("\t\t\tWait for notEmpty condition");
+ Platform.runLater(()-> consumerStatus.setText("Wait for notEmpty condition"));
+
+ notEmpty.await();
+ }
+ 
+  value = queue.remove();
+  Remove_plate();
+  Platform.runLater(()->consumerStatus.setText("Consumer reads " + buffer.read()));
+  notFull.signal(); // Signal notFull condition
+  }
+ catch (InterruptedException ex) {
+  ex.printStackTrace();
+  } 
+finally {
+  lock.unlock(); // Release the lock
+  return value;
+  }
+ }
+ }
+
+
+
    
         
    
