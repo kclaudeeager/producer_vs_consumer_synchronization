@@ -26,7 +26,7 @@ public class ProducerTask implements Runnable {
   System.out.println("Producer writes " + i);
   Platform.runLater(()->statusTextArea.appendText("Producer produced  " + i+" Chapaties\n"));
         //        
- buffer.write(i++); // Add a value to the buffer
+ buffer.Produce(i++); // Add a value to the buffer
  
  // Put the thread into sleep
   Thread.sleep((int)(Math.random() * 10000));

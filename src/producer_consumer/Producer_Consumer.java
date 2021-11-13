@@ -340,7 +340,7 @@ myThread.start();
   private static Condition notEmpty = lock.newCondition();
   private static Condition notFull = lock.newCondition();
  
- public void write(int value) {
+ public void Produce(int value) {
  lock.lock(); // Acquire the lock
  try {
 
@@ -403,13 +403,13 @@ catch (InterruptedException ex) {
 
                           platePane.getChildren().remove(imageview);
                          tablegridpane.getChildren().remove(platePane);
-                         //consumerStatus.setText("Consumer reads" + buffer.read());
+                         //consumerStatus.setText("Consumer reads" + buffer.Consume());
                          
                     });
   }
 
  
- public int read() {
+ public int Consume() {
  int value = 0;
  lock.lock(); // Acquire the lock
   try {

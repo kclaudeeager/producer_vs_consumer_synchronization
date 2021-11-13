@@ -21,8 +21,8 @@ public class ConsumerTask implements Runnable {
   public void run() {
 try {
  while (true) {
-  System.out.println("\t\t\tConsumer consumed " + buffer.read());
-     Platform.runLater(()->statusTextArea.appendText("\t\t\t\t\t\t Consumer consumed " + buffer.read()+" chapaties \n"));
+  System.out.println("\t\t\tConsumer consumed " + buffer.Consume());
+     Platform.runLater(()->statusTextArea.appendText("\t\t\t\t\t\t Consumer consumed " + buffer.Consume()+" chapaties \n"));
   // Put the thread into sleep
   Thread.sleep((int)(Math.random() * 10000));
   }
